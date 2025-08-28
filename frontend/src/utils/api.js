@@ -123,19 +123,28 @@ export const galleryAPI = {
 // Generation API functions
 export const generationAPI = {
   async generateImage(prompt, mode = 'text-to-image', sessionId) {
-    // Double-check HTTPS before making the request
-    const currentBaseURL = apiClient.defaults.baseURL;
-    if (currentBaseURL && currentBaseURL.startsWith('http://') && 
-        (window.location.protocol === 'https:' || currentBaseURL.includes('emergentagent.com'))) {
-      apiClient.defaults.baseURL = currentBaseURL.replace('http://', 'https://');
-      console.log('Updated baseURL to HTTPS:', apiClient.defaults.baseURL);
-    }
+    // Force HTTPS URL construction
+    const baseURL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+    const httpsBaseURL = baseURL.startsWith('http://') && 
+      (window.location.protocol === 'https:' || baseURL.includes('emergentagent.com'))
+      ? baseURL.replace('http://', 'https://')
+      : baseURL;
     
-    const response = await apiClient.post('/generate', {
+    const fullURL = `${httpsBaseURL}/api/generate`;
+    
+    console.log('Direct HTTPS request to:', fullURL);
+    
+    const response = await axios.post(fullURL, {
       prompt,
       mode,
       sessionId
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      timeout: 30000
     });
+    
     return response.data;
   },
 
