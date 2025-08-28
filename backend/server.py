@@ -29,7 +29,8 @@ db = client[os.environ['DB_NAME']]
 app = FastAPI(
     title="Nano Banana AI Image Editor API", 
     version="1.0.0",
-    description="Advanced AI image editing with natural language prompts"
+    description="Advanced AI image editing with natural language prompts",
+    redirect_slashes=False  # Disable automatic slash redirects
 )
 
 # Create a router with the /api prefix
