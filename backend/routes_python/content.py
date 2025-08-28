@@ -199,7 +199,7 @@ async def get_stats():
         # Mock statistics - in real app would query database
         stats = {
             "totalGenerations": 12847,
-            "publicGallery": len(mock_gallery_items) if 'mock_gallery_items' in globals() else 4,
+            "publicGallery": 4,
             "averageProcessingTime": "1.2s",
             "modelVersion": "nano-banana-v1",
             "uptime": "operational",
