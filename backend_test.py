@@ -257,7 +257,7 @@ class NanoBananaBackendTester:
         total_tests += 1
         try:
             payload = {"prompt": "hi", "mode": "text-to-image"}
-            response = self.session.post(f"{self.base_url}/generate", json=payload, timeout=10)
+            response = self.session.post(f"{self.base_url}/generate/", json=payload, timeout=10)
             if response.status_code == 400:
                 self.log_test("Error Handling - Short Prompt", True, "Correctly rejected short prompt")
                 tests_passed += 1
@@ -271,7 +271,7 @@ class NanoBananaBackendTester:
         try:
             long_prompt = "A" * 600  # Over 500 character limit
             payload = {"prompt": long_prompt, "mode": "text-to-image"}
-            response = self.session.post(f"{self.base_url}/generate", json=payload, timeout=10)
+            response = self.session.post(f"{self.base_url}/generate/", json=payload, timeout=10)
             if response.status_code == 400:
                 self.log_test("Error Handling - Long Prompt", True, "Correctly rejected long prompt")
                 tests_passed += 1
