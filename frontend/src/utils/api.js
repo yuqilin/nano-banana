@@ -130,7 +130,7 @@ export const generationAPI = {
       ? baseURL.replace('http://', 'https://')
       : baseURL;
     
-    const fullURL = `${httpsBaseURL}/api/generate`;
+    const fullURL = `${httpsBaseURL}/api/generate/`;
     
     console.log('Direct HTTPS request to:', fullURL);
     
