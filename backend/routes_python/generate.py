@@ -9,6 +9,9 @@ import aiofiles
 import os
 from pathlib import Path
 
+# Import the real AI service
+from services.aiService import aiService
+
 router = APIRouter(prefix="/generate", tags=["generation"])
 
 # Pydantic models
@@ -28,7 +31,7 @@ class GenerationStatus(BaseModel):
     success: bool
     generation: dict
 
-# Mock AI service equivalent to Node.js version
+# Mock AI service equivalent to Node.js version (to be removed)
 class MockAIService:
     def __init__(self):
         self.mock_images = {
