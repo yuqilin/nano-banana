@@ -3,12 +3,22 @@ import { Sun, Moon, ChevronDown } from 'lucide-react';
 import { Button } from './ui/button';
 
 const Header = () => {
+  const scrollToSection = (sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const scrollToEditor = () => scrollToSection('editor');
+  const scrollToShowcase = () => scrollToSection('showcase');
+
   return (
     <header className="sticky top-0 z-50 bg-[#FAF7F0]/95 backdrop-blur-sm border-b border-orange-200/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white text-lg">🍌</span>
             </div>
@@ -19,21 +29,27 @@ const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">
+            <button 
+              onClick={scrollToEditor}
+              className="text-gray-700 hover:text-orange-600 transition-colors font-medium cursor-pointer"
+            >
               Image Editor
-            </a>
-            <a href="#showcase" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">
+            </button>
+            <button 
+              onClick={scrollToShowcase}
+              className="text-gray-700 hover:text-orange-600 transition-colors font-medium cursor-pointer"
+            >
               Showcase
-            </a>
+            </button>
             <div className="relative group">
               <button className="flex items-center space-x-1 text-gray-700 hover:text-orange-600 transition-colors font-medium">
                 <span>Toolbox</span>
                 <ChevronDown size={16} />
               </button>
             </div>
-            <a href="#" className="text-gray-700 hover:text-orange-600 transition-colors font-medium">
+            <button className="text-gray-700 hover:text-orange-600 transition-colors font-medium cursor-pointer">
               Pricing
-            </a>
+            </button>
           </nav>
 
           {/* Right side buttons */}
