@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Ensure HTTPS is used in production
+const API_BASE = BACKEND_URL || window.location.origin;
+const API = `${API_BASE}/api`;
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -12,17 +14,22 @@ const apiClient = axios.create({
   }
 });
 
-// Request interceptor for logging
-apiClient.interceptors.request.use(
-  (config) => {
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
-    return config;
-  },
-  (error) => {
-    console.error('API Request Error:', error);
-    return Promise.reject(error);
+// Force HTTPS in production
+apiClient.interceptors.request.use((config) => {
+  // Ensure HTTPS URLs in production
+  if (config.url && config.url.startsWith('http://') && window.location.protocol === 'https:') {
+    config.url = config.url.replace('http://', 'https://');
   }
-);
+  if (config.baseURL && config.baseURL.startsWith('http://') && window.location.protocol === 'https:') {
+    config.baseURL = config.baseURL.replace('http://', 'https://');
+  }
+  
+  console.log(`API Request: ${config.method?.toUpperCase()} ${config.url || config.baseURL + (config.url || '')}`);
+  return config;
+}, (error) => {
+  console.error('API Request Error:', error);
+  return Promise.reject(error);
+});
 
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
