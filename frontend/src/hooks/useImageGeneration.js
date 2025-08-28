@@ -1,9 +1,6 @@
 import { useState, useCallback } from 'react';
 import { generationAPI, getSessionId } from '../utils/api';
 
-import { useState, useCallback } from 'react';
-import { generationAPI, getSessionId } from '../utils/api';
-
 export const useImageGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStatus, setGenerationStatus] = useState(null);
