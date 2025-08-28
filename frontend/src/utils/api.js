@@ -185,7 +185,12 @@ export const handleAPIError = (error, defaultMessage = 'An error occurred') => {
 export const getSessionId = () => {
   let sessionId = localStorage.getItem('nanobanana_session');
   if (!sessionId) {
-    sessionId = crypto.randomUUID();
+    // Generate UUID-like string without crypto API
+    sessionId = 'xxxx-xxxx-4xxx-yxxx-xxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
     localStorage.setItem('nanobanana_session', sessionId);
   }
   return sessionId;
