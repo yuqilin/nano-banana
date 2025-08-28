@@ -173,11 +173,22 @@ export const generationAPI = {
     formData.append('image', file);
     formData.append('sessionId', sessionId);
 
-    const response = await apiClient.post('/generate/upload', formData, {
+    // Force HTTPS URL construction
+    const baseURL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+    const httpsBaseURL = baseURL.startsWith('http://') && 
+      (window.location.protocol === 'https:' || baseURL.includes('emergentagent.com'))
+      ? baseURL.replace('http://', 'https://')
+      : baseURL;
+    
+    const fullURL = `${httpsBaseURL}/api/generate/upload`;
+
+    const response = await axios.post(fullURL, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
-      }
+      },
+      timeout: 30000
     });
+    
     return response.data;
   },
 
