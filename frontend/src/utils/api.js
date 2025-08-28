@@ -1,9 +1,22 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-// Ensure HTTPS is used in production
-const API_BASE = BACKEND_URL || window.location.origin;
+// Get backend URL and ensure HTTPS
+let BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
+// Force HTTPS if we're running on HTTPS
+if (!BACKEND_URL) {
+  BACKEND_URL = window.location.origin;
+}
+
+// Ensure HTTPS in production
+if (BACKEND_URL.startsWith('http://') && (window.location.protocol === 'https:' || BACKEND_URL.includes('emergentagent.com'))) {
+  BACKEND_URL = BACKEND_URL.replace('http://', 'https://');
+}
+
+const API_BASE = BACKEND_URL;
 const API = `${API_BASE}/api`;
+
+console.log('API Base URL:', API); // Debug log
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -14,17 +27,25 @@ const apiClient = axios.create({
   }
 });
 
-// Force HTTPS in production
+// Force HTTPS in production - Enhanced interceptor
 apiClient.interceptors.request.use((config) => {
-  // Ensure HTTPS URLs in production
-  if (config.url && config.url.startsWith('http://') && window.location.protocol === 'https:') {
-    config.url = config.url.replace('http://', 'https://');
-  }
-  if (config.baseURL && config.baseURL.startsWith('http://') && window.location.protocol === 'https:') {
+  // Ensure the baseURL is HTTPS
+  if (config.baseURL && config.baseURL.startsWith('http://') && 
+      (window.location.protocol === 'https:' || config.baseURL.includes('emergentagent.com'))) {
     config.baseURL = config.baseURL.replace('http://', 'https://');
   }
   
-  console.log(`API Request: ${config.method?.toUpperCase()} ${config.url || config.baseURL + (config.url || '')}`);
+  // Ensure the full URL is HTTPS
+  const fullUrl = config.url ? `${config.baseURL}${config.url}` : config.baseURL;
+  if (fullUrl && fullUrl.startsWith('http://') && 
+      (window.location.protocol === 'https:' || fullUrl.includes('emergentagent.com'))) {
+    const httpsUrl = fullUrl.replace('http://', 'https://');
+    const baseUrl = config.baseURL || '';
+    const relativeUrl = config.url || '';
+    config.baseURL = httpsUrl.replace(relativeUrl, '');
+  }
+  
+  console.log(`API Request: ${config.method?.toUpperCase()} ${config.url || ''} (Base: ${config.baseURL})`);
   return config;
 }, (error) => {
   console.error('API Request Error:', error);
