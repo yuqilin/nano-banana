@@ -106,6 +106,15 @@ app.add_middleware(
 # Include the main API router in the app
 app.include_router(api_router)
 
+# Add database to app state
+@app.on_event("startup")
+async def startup_db_client():
+    app.state.db = db
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    client.close()
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
