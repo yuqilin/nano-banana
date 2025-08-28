@@ -101,6 +101,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include the main API router in the app
+app.include_router(api_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
