@@ -16,6 +16,7 @@ from routes_python.generate import router as generate_router
 from routes_python.gallery import router as gallery_router
 from routes_python.content import router as content_router
 from routes_python.files import router as files_router
+from routes_python.payments import router as payments_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
