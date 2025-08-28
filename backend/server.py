@@ -93,6 +93,7 @@ api_router.include_router(generate_router)
 api_router.include_router(gallery_router)
 api_router.include_router(content_router)
 api_router.include_router(files_router)
+api_router.include_router(payments_router)
 
 app.add_middleware(
     CORSMiddleware,
