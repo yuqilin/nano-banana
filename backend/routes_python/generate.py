@@ -135,8 +135,8 @@ async def generate_image(request: GenerateRequest, background_tasks: BackgroundT
 async def process_generation(generation_id: str, prompt: str, mode: str):
     """Background task to process image generation"""
     try:
-        # Simulate AI processing
-        result = await ai_service.generate_image(prompt, mode)
+        # Use real AI processing
+        result = await aiService.generateImage(prompt, mode)
         
         # In a real app, update database here
         # Update generation status to completed with results
