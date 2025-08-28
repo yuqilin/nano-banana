@@ -123,6 +123,14 @@ export const galleryAPI = {
 // Generation API functions
 export const generationAPI = {
   async generateImage(prompt, mode = 'text-to-image', sessionId) {
+    // Double-check HTTPS before making the request
+    const currentBaseURL = apiClient.defaults.baseURL;
+    if (currentBaseURL && currentBaseURL.startsWith('http://') && 
+        (window.location.protocol === 'https:' || currentBaseURL.includes('emergentagent.com'))) {
+      apiClient.defaults.baseURL = currentBaseURL.replace('http://', 'https://');
+      console.log('Updated baseURL to HTTPS:', apiClient.defaults.baseURL);
+    }
+    
     const response = await apiClient.post('/generate', {
       prompt,
       mode,
