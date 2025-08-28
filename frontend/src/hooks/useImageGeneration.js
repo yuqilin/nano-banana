@@ -1,26 +1,14 @@
 import { useState, useCallback } from 'react';
 import { generationAPI, getSessionId } from '../utils/api';
 
+import { useState, useCallback } from 'react';
+import { generationAPI, getSessionId } from '../utils/api';
+
 export const useImageGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStatus, setGenerationStatus] = useState(null);
   const [error, setError] = useState(null);
   const [generatedImages, setGeneratedImages] = useState([]);
-
-  // Generate session ID for tracking
-  const getSessionId = () => {
-    let sessionId = localStorage.getItem('nanobanana_session');
-    if (!sessionId) {
-      // Generate UUID-like string without crypto API
-      sessionId = 'xxxx-xxxx-4xxx-yxxx-xxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-      localStorage.setItem('nanobanana_session', sessionId);
-    }
-    return sessionId;
-  };
 
   // Start image generation
   const generateImage = useCallback(async (prompt, mode = 'text-to-image', inputImage = null) => {
@@ -31,14 +19,10 @@ export const useImageGeneration = () => {
 
       const sessionId = getSessionId();
       
-      const response = await axios.post(`${API}/generate`, {
-        prompt,
-        mode,
-        sessionId
-      });
+      const response = await generationAPI.generateImage(prompt, mode, sessionId);
 
-      if (response.data.success) {
-        const generationId = response.data.generationId;
+      if (response.success) {
+        const generationId = response.generationId;
         setGenerationStatus('processing');
         
         // Poll for completion
@@ -46,7 +30,7 @@ export const useImageGeneration = () => {
         
         return generationId;
       } else {
-        throw new Error(response.data.error || 'Generation failed');
+        throw new Error(response.error || 'Generation failed');
       }
     } catch (err) {
       console.error('Generation error:', err);
@@ -64,10 +48,10 @@ export const useImageGeneration = () => {
     const poll = async () => {
       try {
         attempts++;
-        const response = await axios.get(`${API}/generate/${generationId}`);
+        const response = await generationAPI.getGenerationStatus(generationId);
         
-        if (response.data.success) {
-          const generation = response.data.generation;
+        if (response.success) {
+          const generation = response.generation;
           
           if (generation.status === 'completed') {
             setGeneratedImages(generation.outputImages || []);
@@ -106,20 +90,12 @@ export const useImageGeneration = () => {
   const uploadImage = useCallback(async (file) => {
     try {
       const sessionId = getSessionId();
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('sessionId', sessionId);
+      const response = await generationAPI.uploadImage(file, sessionId);
 
-      const response = await axios.post(`${API}/generate/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      if (response.data.success) {
-        return response.data.file;
+      if (response.success) {
+        return response.file;
       } else {
-        throw new Error(response.data.error || 'Upload failed');
+        throw new Error(response.error || 'Upload failed');
       }
     } catch (err) {
       console.error('Upload error:', err);
@@ -131,14 +107,12 @@ export const useImageGeneration = () => {
   const getHistory = useCallback(async (limit = 20, skip = 0) => {
     try {
       const sessionId = getSessionId();
-      const response = await axios.get(`${API}/generate/history/${sessionId}`, {
-        params: { limit, skip }
-      });
+      const response = await generationAPI.getHistory(sessionId, { limit, skip });
 
-      if (response.data.success) {
-        return response.data;
+      if (response.success) {
+        return response;
       } else {
-        throw new Error(response.data.error || 'Failed to fetch history');
+        throw new Error(response.error || 'Failed to fetch history');
       }
     } catch (err) {
       console.error('History fetch error:', err);
