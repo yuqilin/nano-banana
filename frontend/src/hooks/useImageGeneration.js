@@ -1,15 +1,5 @@
 import { useState, useCallback } from 'react';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-// Ensure HTTPS is used in production
-const API_BASE = BACKEND_URL || window.location.origin;
-let API = `${API_BASE}/api`;
-
-// Force HTTPS in production
-if (API.startsWith('http://') && window.location.protocol === 'https:') {
-  API = API.replace('http://', 'https://');
-}
+import { generationAPI, getSessionId } from '../utils/api';
 
 export const useImageGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
