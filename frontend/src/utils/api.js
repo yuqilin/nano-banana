@@ -149,7 +149,22 @@ export const generationAPI = {
   },
 
   async getGenerationStatus(generationId) {
-    const response = await apiClient.get(`/generate/${generationId}`);
+    // Force HTTPS URL construction
+    const baseURL = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+    const httpsBaseURL = baseURL.startsWith('http://') && 
+      (window.location.protocol === 'https:' || baseURL.includes('emergentagent.com'))
+      ? baseURL.replace('http://', 'https://')
+      : baseURL;
+    
+    const fullURL = `${httpsBaseURL}/api/generate/${generationId}`;
+    
+    const response = await axios.get(fullURL, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      timeout: 30000
+    });
+    
     return response.data;
   },
 
