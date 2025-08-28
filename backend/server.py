@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, MiddlewareHTTP
+from fastapi import FastAPI, APIRouter
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -11,9 +11,11 @@ from typing import List
 import uuid
 from datetime import datetime
 
-# Import Node.js route handlers
-import subprocess
-import json
+# Import route modules
+from routes_python.generate import router as generate_router
+from routes_python.gallery import router as gallery_router
+from routes_python.content import router as content_router
+from routes_python.files import router as files_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -24,7 +26,11 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app
-app = FastAPI(title="Nano Banana AI Image Editor API", version="1.0.0")
+app = FastAPI(
+    title="Nano Banana AI Image Editor API", 
+    version="1.0.0",
+    description="Advanced AI image editing with natural language prompts"
+)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -41,7 +47,12 @@ class StatusCheckCreate(BaseModel):
 # Basic health check endpoints
 @api_router.get("/")
 async def root():
-    return {"message": "Nano Banana AI Image Editor API", "version": "1.0.0", "status": "operational"}
+    return {
+        "message": "Nano Banana AI Image Editor API", 
+        "version": "1.0.0", 
+        "status": "operational",
+        "features": ["Image Generation", "Gallery", "File Upload"]
+    }
 
 @api_router.get("/health")
 async def health_check():
@@ -52,7 +63,7 @@ async def health_check():
             "status": "healthy",
             "database": "connected",
             "timestamp": datetime.utcnow(),
-            "uptime": "operational"
+            "services": ["API", "Database", "File Storage"]
         }
     except Exception as e:
         return {
@@ -75,17 +86,13 @@ async def get_status_checks():
     status_checks = await db.status_checks.find().to_list(1000)
     return [StatusCheck(**status_check) for status_check in status_checks]
 
-# Proxy function to handle Node.js routes
-async def proxy_to_node(path: str, method: str, body: dict = None, query_params: dict = None):
-    """Proxy requests to Node.js handlers"""
-    try:
-        # This is a simplified proxy - in production you'd use a proper Node.js server
-        # For now, we'll create direct endpoints in FastAPI that replicate the Node.js logic
-        pass
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+# Include all routers
+api_router.include_router(generate_router)
+api_router.include_router(gallery_router)
+api_router.include_router(content_router)
+api_router.include_router(files_router)
 
-# Include the router in the main app
+# Include the main API router in the app
 app.include_router(api_router)
 
 app.add_middleware(
