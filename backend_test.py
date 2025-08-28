@@ -171,7 +171,7 @@ class NanoBananaBackendTester:
             }
             
             response = self.session.post(
-                f"{self.base_url}/generate", 
+                f"{self.base_url}/generate/", 
                 json=payload,
                 timeout=15
             )
