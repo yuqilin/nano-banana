@@ -31,60 +31,6 @@ class GenerationStatus(BaseModel):
     success: bool
     generation: dict
 
-# Mock AI service equivalent to Node.js version (to be removed)
-class MockAIService:
-    def __init__(self):
-        self.mock_images = {
-            "mountain": [
-                "https://images.unsplash.com/photo-1494806812796-244fe51b774d?w=800&q=80",
-                "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-            ],
-            "garden": [
-                "https://images.unsplash.com/photo-1563714193017-5a5fb60bc02b?w=800&q=80",
-                "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80",
-            ],
-            "aurora": [
-                "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80",
-                "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=800&q=80",
-            ],
-            "default": [
-                "https://images.unsplash.com/photo-1518709268805-4e9042af2ac1?w=800&q=80",
-                "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-            ]
-        }
-
-    def categorize_prompt(self, prompt: str) -> str:
-        prompt_lower = prompt.lower()
-        if any(word in prompt_lower for word in ['mountain', 'peak', 'snow']):
-            return 'mountain'
-        elif any(word in prompt_lower for word in ['garden', 'flower', 'plant']):
-            return 'garden'
-        elif any(word in prompt_lower for word in ['aurora', 'northern light', 'borealis']):
-            return 'aurora'
-        return 'default'
-
-    async def generate_image(self, prompt: str, mode: str = "text-to-image"):
-        # Simulate processing time
-        processing_time = 0.8 + (1.2 * __import__('random').random())  # 0.8-2 seconds
-        await asyncio.sleep(processing_time)
-        
-        category = self.categorize_prompt(prompt)
-        image_pool = self.mock_images.get(category, self.mock_images['default'])
-        selected_image = __import__('random').choice(image_pool)
-        
-        return {
-            'success': True,
-            'images': [selected_image],
-            'processingTime': processing_time * 1000,  # Convert to milliseconds
-            'metadata': {
-                'model': 'nano-banana-v1-mock',
-                'category': category,
-                'prompt': prompt,
-                'mode': mode
-            }
-        }
-
-ai_service = MockAIService()
 
 @router.post("/", response_model=GenerateResponse)
 async def generate_image(request: GenerateRequest, background_tasks: BackgroundTasks):
