@@ -93,8 +93,13 @@ api_router.include_router(gallery_router)
 api_router.include_router(content_router)
 api_router.include_router(files_router)
 
-# Include the main API router in the app
-app.include_router(api_router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.add_middleware(
     CORSMiddleware,
